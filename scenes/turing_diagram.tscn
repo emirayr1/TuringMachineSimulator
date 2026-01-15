@@ -1,0 +1,51 @@
+[gd_scene load_steps=4 format=3 uid="uid://tk4skxso4nob"]
+
+[ext_resource type="Script" uid="uid://dqhyio3ottio" path="res://scripts/turing_diagram.gd" id="1_0d0rr"]
+[ext_resource type="PackedScene" uid="uid://bke2u3g00pqxf" path="res://scenes/state_node.tscn" id="2_0d0rr"]
+[ext_resource type="PackedScene" uid="uid://cbqg3sw4kucyx" path="res://scenes/transition_line.tscn" id="3_dtcrn"]
+
+[node name="TuringDiagram" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_0d0rr")
+
+[node name="StateNodeA" parent="." instance=ExtResource("2_0d0rr")]
+layout_mode = 1
+radius = 20.0
+
+[node name="StateNodeB" parent="." instance=ExtResource("2_0d0rr")]
+layout_mode = 1
+state_name = "B"
+radius = 20.0
+
+[node name="StateNodeC" parent="." instance=ExtResource("2_0d0rr")]
+layout_mode = 1
+state_name = "C"
+radius = 20.0
+
+[node name="StateNodeD" parent="." instance=ExtResource("2_0d0rr")]
+layout_mode = 1
+state_name = "D"
+radius = 20.0
+
+[node name="TransitionLine" parent="." node_paths=PackedStringArray("from_node", "to_node") instance=ExtResource("3_dtcrn")]
+layout_mode = 1
+from_node = NodePath("../StateNodeA")
+to_node = NodePath("../StateNodeB")
+label = "0 -> 1, R"
+
+[node name="TransitionLine2" parent="." node_paths=PackedStringArray("from_node", "to_node") instance=ExtResource("3_dtcrn")]
+layout_mode = 1
+from_node = NodePath("../StateNodeB")
+to_node = NodePath("../StateNodeC")
+label = "_ -> _ , L"
+
+[node name="TransitionLine3" parent="." node_paths=PackedStringArray("from_node", "to_node") instance=ExtResource("3_dtcrn")]
+layout_mode = 1
+from_node = NodePath("../StateNodeC")
+to_node = NodePath("../StateNodeD")
+label = "1 → _ , L"
