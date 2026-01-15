@@ -38,7 +38,7 @@ func _draw():
 
 	draw_polygon(
 		PackedVector2Array([p1, p2, p3]),
-		PackedColorArray([Color.WHITE])
+		PackedColorArray([Color.BLACK])
 	)
 	## Label
 	draw_string(

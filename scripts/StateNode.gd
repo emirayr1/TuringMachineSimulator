@@ -11,6 +11,6 @@ func _ready():
 	$Label.position = custom_minimum_size / 2 - $Label.size / 2
 
 func _draw():
-	draw_circle(custom_minimum_size / 2, radius, Color.WHITE, false, 5.0)
+	draw_circle(custom_minimum_size / 2, radius, Color.BLACK, false, 5.0)
 	if is_accept:
-		draw_circle(custom_minimum_size / 2, radius - 6, Color.WHITE)
+		draw_circle(custom_minimum_size / 2, radius - 6, Color.BLACK)
