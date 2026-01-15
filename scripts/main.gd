@@ -136,7 +136,7 @@ func run_step(symbol_array, play_head_scene, step) -> void:
 		current_symbol,
 		new_symbol,
 		direction,
-		new_state])
+		States.keys()[new_state]])
 	
 	# write symbol
 	var anim = play_head_scene.get_node("AnimationPlayer")
