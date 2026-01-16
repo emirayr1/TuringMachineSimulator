@@ -43,11 +43,12 @@ text = "Play"
 
 [node name="Settings" type="OptionButton" parent="ButtonContainer"]
 layout_mode = 2
+alignment = 1
 selected = 0
 item_count = 2
 popup/item_0/text = "Unary Addition"
 popup/item_0/id = 0
-popup/item_1/text = "Binary Addition"
+popup/item_1/text = "Unary Multiplication"
 popup/item_1/id = 1
 
 [node name="Caption" type="RichTextLabel" parent="."]

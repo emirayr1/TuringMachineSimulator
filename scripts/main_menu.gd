@@ -16,9 +16,9 @@ func _process(delta: float) -> void:
 
 func _on_play_pressed() -> void:
 	var selected_index = settings.get_selected()
-	var mode : String = settings.get_item_text(selected_index)
+	#var modeText : String = settings.get_item_text(selected_index)
 	if text_edit1.text == "" or text_edit2.text == "":
 		print("You Have To Pass Numbers To Sum")
 	else:
 		var inputs = [int(text_edit1.text), int(text_edit2.text)]
-		emit_signal("play_pressed", mode, inputs)
+		emit_signal("play_pressed", selected_index, inputs)
