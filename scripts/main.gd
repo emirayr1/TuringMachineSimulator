@@ -8,39 +8,41 @@ extends Node2D
 var cell_scene := preload("res://scenes/cell.tscn")
 var play_head_scene := preload("res://scenes/play_head.tscn")
 var cell_array = []
+var current_logic: Node
+var speed_coef : float
 
-enum States{
-	A,
-	B,
-	C,
-	D,
-	Reject,
-	Accept
-}
+var prev_mode_idx: int
+var prev_inputs: Array
 
 enum Modes{
 	UNARYSUM,
 	UNARYMULT,
 }
 
-var current_state = States.A
+var current_state
 var head_position = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	menu.play_pressed.connect(_on_play_pressed)
+	speed_coef = $CanvasLayer/anim_speed_slider.value
 	
 func _on_play_pressed(modeIdx : int, inputs: Array):
 	menu.hide()
 	background.visible = 1
 	diagram.visible = 1
 	
+	prev_inputs = inputs
+	prev_mode_idx = modeIdx
+	
 	var mode = null
 	if modeIdx == 0:
 		mode = Modes.UNARYSUM
+		current_logic = UnarySumLogic
 	elif modeIdx == 1:
 		mode = Modes.UNARYMULT
-		
+		current_logic = UnaryMultLogic
+	current_state = current_logic.get_start_state()
 	start_game(inputs, mode)
 
 func start_game(inputs: Array, mode: Modes) -> void:
@@ -115,6 +117,7 @@ func create_tape(x:int, y:int, symbol_array, play_head_scene, mode: Modes):
 	if cont_rows.size() > 0:
 		rows.append(cont_rows)
 		
+	var global_cell_index : int = 0
 	for row in rows:
 		var row_cell_count = row.size()
 		var row_length = (row_cell_count * cell_size.x) + ((row_cell_count - 1) * pad)
@@ -127,47 +130,18 @@ func create_tape(x:int, y:int, symbol_array, play_head_scene, mode: Modes):
 			cell_scene.position = Vector2(pos_x, first_y_pos)
 			tape.add_child(cell_scene)
 			cell_array.append(cell_scene)
-			cell_scene.set_symbol(symbol_array[0])
+			cell_scene.set_symbol(symbol_array[global_cell_index])
+			global_cell_index += 1
 		first_y_pos += cell_size.y + pad_y
 		
 	play_head_scene.position = Vector2(cell_array[0].position.x, origin_y - 40)
 	add_child(play_head_scene)
 		
-func transition_function(state: States, symbol: String):
-	if state == States.A:
-		if symbol == "0":
-			return ["1", 1, States.B] # notation is -> symbol, move left or right, next state
-		elif symbol == "1":
-			return ["1", 1, States.A]
-		elif symbol == "-":
-			return ["-", 1, States.A]
-	
-	elif state == States.B:
-		if symbol == "1":
-			return ["1", 1, States.B]
-		elif symbol == "-":
-			return ["-", -1, States.C]
-		elif symbol == "0":
-			return [symbol, 0, States.Reject]
-	
-	elif state == States.C:
-		if symbol == "1":
-			return ["-", -1, States.D]
-		else:
-			return [symbol, 0, States.Reject]
-	
-	elif state == States.D:
-		if symbol == "1":
-			return ["1", -1, States.D]
-		elif symbol == "-":
-			return ["-", 1, States.Accept]
-	
-	return [symbol, 0, States.Reject]
-
+		
 func run_step(symbol_array, play_head_scene, step) -> void:
 	
 	var current_symbol = symbol_array[head_position]
-	var result = transition_function(current_state, current_symbol)
+	var result = current_logic.transition_function(current_state, current_symbol)
 	var new_symbol = result[0]
 	var direction = result[1]
 	var new_state = result[2]
@@ -179,13 +153,12 @@ func run_step(symbol_array, play_head_scene, step) -> void:
 		current_symbol,
 		new_symbol,
 		direction,
-		States.keys()[new_state]])
+		current_logic.States.keys()[new_state]])
 	
 	# write symbol
 	var anim : AnimationPlayer = play_head_scene.get_node("AnimationPlayer")
 	var base_duration : float = 0.4
-	var speed_coef : float = max(cell_array.size() * 0.17, 1.0)
-	
+	print(speed_coef)
 	var second : float = base_duration / speed_coef
 
 	anim.play("write", -1, speed_coef)
@@ -197,12 +170,20 @@ func run_step(symbol_array, play_head_scene, step) -> void:
 	head_position += direction
 	await play_head_scene.move(cell_array[head_position].position.x, cell_array[head_position].position.y
 								, second)
-		
 	# Change State
 	current_state = new_state
 	
 func start_calculation(symbol_array, play_head_scene):
 	var step = 0
-	while current_state not in [States.Accept, States.Reject]:
+	while current_state not in [current_logic.States.Accept, current_logic.States.Reject]:
 		await run_step(symbol_array, play_head_scene, step)
 		step += 1
+
+
+func _on_anim_speed_slider_value_changed(value: float) -> void:
+	speed_coef = value
+
+
+func _on_restart_button_pressed() -> void:
+	#TODO
+	start_game(prev_inputs, prev_mode_idx)

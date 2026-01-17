@@ -14,3 +14,8 @@ config/name="TuringSimulator2D"
 run/main_scene="uid://dij5c4h6ghlk8"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+UnarySumLogic="*res://scripts/singleton/logic/UnarySumLogic.gd"
+UnaryMultLogic="*res://scripts/singleton/logic/UnaryMultLogic.gd"
